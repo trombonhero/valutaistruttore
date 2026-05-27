@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mentor Dashboard V5</title>
+    <title>Mentor Dashboard V6</title>
     <style>
         :root {
             --bg-color: #121212;
@@ -32,7 +32,32 @@
         h2 {
             text-align: center;
             color: var(--accent-color);
-            margin: 10px 0;
+            margin: 5px 0 10px 0;
+        }
+
+        /* Selettore di Modalità */
+        .mode-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .mode-btn {
+            flex: 1;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: 2px solid #333;
+            background-color: #181818;
+            color: #aaa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .mode-btn.active {
+            border-color: var(--accent-color);
+            background-color: #242424;
+            color: #fff;
+            box-shadow: 0 0 10px rgba(0, 173, 181, 0.3);
         }
 
         .card {
@@ -104,12 +129,14 @@
         .tag-text {
             font-size: 0.9rem;
             font-weight: 500;
+            padding-right: 10px;
         }
 
         .stepper {
             display: flex;
             align-items: center;
             gap: 12px;
+            flex-shrink: 0;
         }
 
         .step-btn {
@@ -198,7 +225,7 @@
         @media print {
             @page {
                 size: A4 portrait;
-                margin: 8mm 8mm 8mm 8mm;
+                margin: 8mm;
             }
             body {
                 background: #fff !important;
@@ -219,7 +246,7 @@
                 padding: 10px !important;
                 page-break-inside: avoid;
             }
-            .step-btn, .action-btn, .clear-btn, h2, .mini-legend-card {
+            .step-btn, .action-btn, .clear-btn, h2, .mini-legend-card, .mode-container {
                 display: none !important;
             }
             .print-header {
@@ -231,7 +258,7 @@
             }
             .print-header h1 {
                 margin: 0;
-                font-size: 1.4rem;
+                font-size: 1.3rem;
                 color: #000;
             }
             .print-header p {
@@ -285,14 +312,14 @@
                 color: #000 !important;
                 border: 1px solid #999 !important;
                 padding: 6px !important;
-                height: 90px !important;
-                min-height: 90px !important;
+                height: 85px !important;
+                min-height: 85px !important;
             }
             .eval-row {
                 background: #f9f9f9 !important;
                 border: 1px solid #ddd !important;
                 color: #000 !important;
-                padding: 6px 10px !important;
+                padding: 5px 10px !important;
                 margin-bottom: 4px !important;
             }
             .eval-row select {
@@ -302,7 +329,7 @@
                 -webkit-appearance: none;
                 appearance: none;
                 font-size: 1rem !important;
-                width: 50px !important; /* Allargato per evitare il taglio del numero 10 */
+                width: 50px !important;
                 text-align: center !important;
                 font-weight: bold;
                 padding: 0 !important;
@@ -320,20 +347,25 @@
 <div class="container">
     
     <div class="print-header">
-        <h1>RELAZIONE VALUTAZIONE GUIDA TIROCINANTE</h1>
+        <h1 id="printTitle">RELAZIONE VALUTAZIONE GUIDA TIROCINANTE</h1>
         <p>Programma Mentor di Supervisione e Controllo - Conti Autoscuole</p>
     </div>
 
-    <h2>Mentor Dashboard V5 🚗</h2>
+    <h2>Mentor Dashboard V6 🚗 Aula/Strada</h2>
+    
+    <div class="mode-container">
+        <button id="btnStrada" class="mode-btn active" onclick="switchMode('strada')">🚗 Lezione in Strada</button>
+        <button id="btnAula" class="mode-btn" onclick="switchMode('aula')">🏫 Lezione in Aula</button>
+    </div>
     
     <div class="card">
         <div class="grid-inputs">
             <div>
-                <label>Allievo / Allieva Guida</label>
+                <label>Allievo / Allieva Supervisionato</label>
                 <input type="text" id="allievo" placeholder="Nome Allievo">
             </div>
             <div>
-                <label>Dettaglio Patente</label>
+                <label id="lblDettaglio">Dettaglio Patente</label>
                 <input type="text" id="patente" placeholder="Es. Pat. B • Palestrina">
             </div>
         </div>
@@ -343,10 +375,10 @@
         <div class="section-title">Registro Comportamenti (Tasti + e -)</div>
         
         <div class="block-tag" style="border-left: 4px solid var(--pedali-color);">
-            <label style="color: var(--pedali-color);">TIMING PEDALI & RIFLESSI</label>
+            <label id="titleBlock1" style="color: var(--pedali-color);">TIMING PEDALI & RIFLESSI</label>
             <div class="tag-list">
                 <div class="tag-item">
-                    <span class="tag-text">Pedale Anticipato - Ruba spazio di apprendimento</span>
+                    <span id="txtPA" class="tag-text">Pedale Anticipato - Ruba spazio di apprendimento</span>
                     <div class="stepper">
                         <button class="step-btn btn-minus" onclick="step('PA', -1)">-</button>
                         <span class="step-value" id="val-PA">0</span>
@@ -354,7 +386,7 @@
                     </div>
                 </div>
                 <div class="tag-item">
-                    <span class="tag-text">Pedale Tardivo - Condizione di potenziale risco</span>
+                    <span id="txtPT" class="tag-text">Pedale Tardivo - Condizione di potenziale rischio</span>
                     <div class="stepper">
                         <button class="step-btn btn-minus" onclick="step('PT', -1)">-</button>
                         <span class="step-value" id="val-PT">0</span>
@@ -362,7 +394,7 @@
                     </div>
                 </div>
                 <div class="tag-item">
-                    <span class="tag-text">Piede Pesante - Copertura costante dei pedali</span>
+                    <span id="txtPP" class="tag-text">Piede Pesante - Copertura costante dei pedali</span>
                     <div class="stepper">
                         <button class="step-btn btn-minus" onclick="step('PP', -1)">-</button>
                         <span class="step-value" id="val-PP">0</span>
@@ -373,10 +405,10 @@
         </div>
 
         <div class="block-tag" style="border-left: 4px solid var(--voce-color);">
-            <label style="color: var(--voce-color);">COMANDI VOCALI & ANTICIPO STRADALE</label>
+            <label id="titleBlock2" style="color: var(--voce-color);">COMANDI VOCALI & ANTICIPO STRADALE</label>
             <div class="tag-list">
                 <div class="tag-item">
-                    <span class="tag-text">Comando Anticipato - Gestione e metri di preavviso ottimali</span>
+                    <span id="txtCA" class="tag-text">Comando Anticipato - Gestione e metri di preavviso ottimali</span>
                     <div class="stepper">
                         <button class="step-btn btn-minus" onclick="step('CA', -1)">-</button>
                         <span class="step-value" id="val-CA">0</span>
@@ -384,7 +416,7 @@
                     </div>
                 </div>
                 <div class="tag-item">
-                    <span class="tag-text">Comando Tardivo - Indicazione impartita in ritardo</span>
+                    <span id="txtCT" class="tag-text">Comando Tardivo - Indicazione impartita in ritardo</span>
                     <div class="stepper">
                         <button class="step-btn btn-minus" onclick="step('CT', -1)">-</button>
                         <span class="step-value" id="val-CT">0</span>
@@ -392,7 +424,7 @@
                     </div>
                 </div>
                 <div class="tag-item">
-                    <span class="tag-text">Sovraccarico Parola - Eccesso di spiegazioni in marcia</span>
+                    <span id="txtSP" class="tag-text">Sovraccarico Parola - Eccesso di spiegazioni in marcia</span>
                     <div class="stepper">
                         <button class="step-btn btn-minus" onclick="step('SP', -1)">-</button>
                         <span class="step-value" id="val-SP">0</span>
@@ -403,10 +435,10 @@
         </div>
 
         <div class="block-tag" style="border-left: 4px solid var(--occhi-color);">
-            <label style="color: var(--occhi-color);">SGUARDO & LETTURA STRADA DAL SEDILE DESTRO</label>
+            <label id="titleBlock3" style="color: var(--occhi-color);">SGUARDO & LETTURA STRADA DAL SEDILE DESTRO</label>
             <div class="tag-list">
                 <div class="tag-item">
-                    <span class="tag-text">Occhi Bassi - Sguardo fisso</span>
+                    <span id="txtOB" class="tag-text">Occhi Bassi - Sguardo fisso</span>
                     <div class="stepper">
                         <button class="step-btn btn-minus" onclick="step('OB', -1)">-</button>
                         <span class="step-value" id="val-OB">0</span>
@@ -414,7 +446,7 @@
                     </div>
                 </div>
                 <div class="tag-item">
-                    <span class="tag-text">Mancato Controllo - Assenza di verifica angolo cieco</span>
+                    <span id="txtMC" class="tag-text">Mancato Controllo - Assenza di verifica angolo cieco</span>
                     <div class="stepper">
                         <button class="step-btn btn-minus" onclick="step('MC', -1)">-</button>
                         <span class="step-value" id="val-MC">0</span>
@@ -425,10 +457,10 @@
         </div>
 
         <div class="block-tag" style="border-left: 4px solid var(--clima-color);">
-            <label style="color: var(--clima-color);">EMOTIVITÀ & GESTIONE DELLO STRESS IN ABITACOLO</label>
+            <label id="titleBlock4" style="color: var(--clima-color);">EMOTIVITÀ & GESTIONE DELLO STRESS IN ABITACOLO</label>
             <div class="tag-list">
                 <div class="tag-item">
-                    <span class="tag-text">Gestione Eccellente - Mantenimento della calma e risoluzione del panico</span>
+                    <span id="txtGE" class="tag-text">Gestione Eccellente - Mantenimento della calma e risoluzione del panico</span>
                     <div class="stepper">
                         <button class="step-btn btn-minus" onclick="step('GE', -1)">-</button>
                         <span class="step-value" id="val-GE">0</span>
@@ -436,7 +468,7 @@
                     </div>
                 </div>
                 <div class="tag-item">
-                    <span class="tag-text">Tono Ansioso - Trasmissione di tensione o rigidità all'allievo</span>
+                    <span id="txtTA" class="tag-text">Tono Ansioso - Trasmissione di tensione o rigidità all'allievo</span>
                     <div class="stepper">
                         <button class="step-btn btn-minus" onclick="step('TA', -1)">-</button>
                         <span class="step-value" id="val-TA">0</span>
@@ -449,30 +481,30 @@
 
     <div class="card">
         <div class="section-title">Note Libere e Diario di Bordo (Scrittura Manuale)</div>
-        <textarea id="manualNotes" placeholder="Spazio libero per i tuoi appunti chirurgici durante lo svolgimento della guida..."></textarea>
+        <textarea id="manualNotes" placeholder="Spazio libero per i tuoi appunti chirurgici durante lo svolgimento della lezione..."></textarea>
     </div>
 
     <div class="card">
         <div class="section-title">Valutazione Finale (Auto-Accordata 0-10)</div>
         
         <div class="eval-row">
-            <label>1. Tempismo Pedali / Riflessi</label>
+            <label id="lblVoto1">1. Tempismo Pedali / Riflessi</label>
             <select id="votoPedali"></select>
         </div>
         <div class="eval-row">
-            <label>2. Chiarezza & Anticipo Comandi</label>
+            <label id="lblVoto2">2. Chiarezza & Anticipo Comandi</label>
             <select id="votoVoce"></select>
         </div>
         <div class="eval-row">
-            <label>3. Sguardo e Lettura Strada (Sedile DX)</label>
+            <label id="lblVoto3">3. Sguardo e Lettura Strada (Sedile DX)</label>
             <select id="votoOcchi"></select>
         </div>
         <div class="eval-row">
-            <label>4. Leadership & Gestione Stress (Clima)</label>
+            <label id="lblVoto4">4. Leadership & Gestione Stress (Clima)</label>
             <select id="votoClima"></select>
         </div>
         <div class="eval-row">
-            <label>5. Qualità Diagnosi & Note Finali (DA FARE)</label>
+            <label id="lblVoto5">5. Qualità Diagnosi & Note Finali (DA FARE)</label>
             <select id="votoNote"></select>
         </div>
     </div>
@@ -485,18 +517,70 @@
             <strong>Guida Rapida Intervento Mentor (0-10):</strong>
             <ul>
                 <li><strong>9 - 10: Ghost Mode.</strong> Autonomia totale della tirocinante. Tu sei un fantasma dietro.</li>
-                <li><strong>7 - 8: Controllo Passivo.</strong> Intervieni solo a motore spento a fine lezione. <em>(Soglia minima autonomia)</em>.</li>
-                <li><strong>5 - 6: Intervento Moderato.</strong> Ti sporgi in avanti e le dai suggerimenti ad auto ferma tra una manovra e l'altra.</li>
-                <li><strong>3 - 4: Intervento Attivo.</strong> Devi correggerla verbalmente a vettura in movimento perché dà indicazioni errate.</li>
-                <li><strong>0 - 2: Codice Rosso.</strong> Devi intervenire fisicamente o con comandi secchi per evitare situazioni di pericolo.</li>
+                <li><strong>7 - 8: Controllo Passivo.</strong> Intervieni solo a motore spento o a fine lezione. <em>(Soglia minima autonomia)</em>.</li>
+                <li><strong>5 - 6: Intervento Moderato.</strong> Feedback ad auto ferma (Strada) o durante le pause/esercizi (Aula).</li>
+                <li><strong>3 - 4: Intervento Attivo.</strong> Devi correggerla verbalmente a lezione in corso perché dà indicazioni errate.</li>
+                <li><strong>0 - 2: Codice Rosso.</strong> Devi intervenire per bloccare situazioni di emergenza o strafalcioni normativi gravi.</li>
             </ul>
         </div>
     </div>
-
 </div>
 
 <script>
+    let currentMode = 'strada';
     let contatori = { PA: 0, PT: 0, PP: 0, CA: 0, CT: 0, SP: 0, OB: 0, MC: 0, GE: 0, TA: 0 };
+
+    // Dizionario Traduzioni Dinamiche Aula/Strada
+    const dizionario = {
+        strada: {
+            printTitle: "RELAZIONE VALUTAZIONE GUIDA TIROCINANTE",
+            lblDettaglio: "Dettaglio Patente",
+            patentePlaceholder: "Es. Pat. B • Palestrina",
+            titleBlock1: "TIMING PEDALI & RIFLESSI",
+            txtPA: "Pedale Anticipato - Ruba spazio di apprendimento",
+            txtPT: "Pedale Tardivo - Condizione di potenziale rischio",
+            txtPP: "Piede Pesante - Copertura costante dei pedali",
+            titleBlock2: "COMANDI VOCALI & ANTICIPO STRADALE",
+            txtCA: "Comando Anticipato - Gestione e metri di preavviso ottimali",
+            txtCT: "Comando Tardivo - Indicazione impartita in ritardo",
+            txtSP: "Sovraccarico Parola - Eccesso di spiegazioni in marcia",
+            titleBlock3: "SGUARDO & LETTURA STRADA DAL SEDILE DESTRO",
+            txtOB: "Occhi Bassi - Sguardo fisso",
+            txtMC: "Mancato Controllo - Assenza di verifica angolo cieco",
+            titleBlock4: "EMOTIVITÀ & GESTIONE DELLO STRESS IN ABITACOLO",
+            txtGE: "Gestione Eccellente - Mantenimento della calma e risoluzione del panico",
+            txtTA: "Tono Ansioso - Trasmissione di tensione o rigidità all'allievo",
+            lblVoto1: "1. Tempismo Pedali / Riflessi",
+            lblVoto2: "2. Chiarezza & Anticipo Comandi",
+            lblVoto3: "3. Sguardo e Lettura Strada (Sedile DX)",
+            lblVoto4: "4. Leadership & Gestione Stress (Clima)",
+            lblVoto5: "5. Qualità Diagnosi & Note Finali (DA FARE)"
+        },
+        aula: {
+            printTitle: "RELAZIONE VALUTAZIONE LEZIONE IN AULA",
+            lblDettaglio: "Argomento Trattato",
+            patentePlaceholder: "Es. Segnaletica Verticale / Incroci",
+            titleBlock1: "PRESENZA IN AULA & LINGUAGGIO CORPOREO",
+            txtPA: "Postura Statica - Bloccata alla cattedra o spalle all'aula",
+            txtPT: "Ritmo Troppo Rapido - Corre sui concetti senza pause didattiche",
+            txtPP: "Tic Verbali o Gesti Ripetitivi - Causa distrazione nell'aula",
+            titleBlock2: "CHIAREZZA ESPOSITIVA & DIDATTICA",
+            txtCA: "Spiegazione Semplice - Ottimo uso di esempi pratici o motti efficaci",
+            txtCT: "Lessico Errato - Definizione tecnica o normativa imprecisa/sbagliata",
+            txtSP: "Digressione Inutile - Si perde in dettagli fuori tema e perde il filo",
+            titleBlock3: "CONTROLLO DELL'AULA & ATTENZIONE",
+            txtOB: "Sguardo Fisso su Slide/Appunti - Mancato contatto visivo con i ragazzi",
+            txtMC: "Mancato Controllo Aula - Non nota studenti distratti o al telefono",
+            titleBlock4: "GESTIONE DOMANDE & IMPREVISTI",
+            txtGE: "Risposta Eccellente - Gestisce i dubbi o le interruzioni con sicurezza",
+            txtTA: "Reazione Stizzita o Insicura - Difficoltà a gestire il disturbo o il brusio",
+            lblVoto1: "1. Presenza in Aula & Gestione Spazio",
+            lblVoto2: "2. Chiarezza Espositiva & Metodo Didattico",
+            lblVoto3: "3. Controllo Visivo dell'Aula & Attenzione",
+            lblVoto4: "4. Gestione del Gruppo & Risposta Imprevisti",
+            lblVoto5: "5. Efficacia della Lezione & Coerenza Lesson Plan"
+        }
+    };
 
     window.onload = function() {
         const dropIds = ['votoPedali', 'votoVoce', 'votoOcchi', 'votoClima', 'votoNote'];
@@ -520,8 +604,60 @@
         document.getElementById('votoNote').value = 8;
     }
 
+    function switchMode(mode) {
+        if(mode === currentMode) return;
+        
+        // Verifica se resettare i dati per non inquinare il cambio modalità
+        if(Object.values(contatori).some(v => v > 0)) {
+            if(!confirm("Cambiando modalità azzererai i contatori correnti della sessione. Continuare?")) return;
+        }
+
+        currentMode = mode;
+        
+        // Aggiorna classi bottoni
+        document.getElementById('btnStrada').classList.toggle('active', mode === 'strada');
+        document.getElementById('btnAula').classList.toggle('active', mode === 'aula');
+        
+        // Cambia i testi dell'interfaccia al volo
+        const t = dizionario[mode];
+        document.getElementById('printTitle').innerText = t.printTitle;
+        document.getElementById('lblDettaglio').innerText = t.lblDettaglio;
+        document.getElementById('patente').placeholder = t.patentePlaceholder;
+        
+        document.getElementById('titleBlock1').innerText = t.titleBlock1;
+        document.getElementById('txtPA').innerText = t.txtPA;
+        document.getElementById('txtPT').innerText = t.txtPT;
+        document.getElementById('txtPP').innerText = t.txtPP;
+        
+        document.getElementById('titleBlock2').innerText = t.titleBlock2;
+        document.getElementById('txtCA').innerText = t.txtCA;
+        document.getElementById('txtCT').innerText = t.txtCT;
+        document.getElementById('txtSP').innerText = t.txtSP;
+        
+        document.getElementById('titleBlock3').innerText = t.titleBlock3;
+        document.getElementById('txtOB').innerText = t.txtOB;
+        document.getElementById('txtMC').innerText = t.txtMC;
+        
+        document.getElementById('titleBlock4').innerText = t.titleBlock4;
+        document.getElementById('txtGE').innerText = t.txtGE;
+        document.getElementById('txtTA').innerText = t.txtTA;
+        
+        document.getElementById('lblVoto1').innerText = t.lblVoto1;
+        document.getElementById('lblVoto2').innerText = t.lblVoto2;
+        document.getElementById('lblVoto3').innerText = t.lblVoto3;
+        document.getElementById('lblVoto4').innerText = t.lblVoto4;
+        document.getElementById('lblVoto5').innerText = t.lblVoto5;
+
+        // Reset pulito dei contatori
+        for (let chiave in contatori) { 
+            contatori[chiave] = 0; 
+            document.getElementById(`val-${chiave}`).innerHTML = 0;
+        }
+        resetVotiIniziali();
+    }
+
     function step(codice, variazione) {
-        contatori[codice] = Math.max(0, contatori[codice] + variazione);
+        contators = contatori[codice] = Math.max(0, contatori[codice] + variazione);
         document.getElementById(`val-${codice}`).innerHTML = contatori[codice];
         calcolaPunteggiDinamici();
     }
