@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentor Dashboard - Monitoraggio Tirocinante</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --accent-color: #00adb5;
+            --danger-color: #ff2e63;
+            --warning-color: #ff9f43;
+            --success-color: #10ac84;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h2, h3 {
+            text-align: center;
+            color: var(--accent-color);
+            margin: 10px 0;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            color: #b3b3b3;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            background-color: #2d2d2d;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        .section-title {
+            font-weight: bold;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        /* Pulsanti di Log Rapido */
+        .log-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .log-btn {
+            padding: 12px 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .btn-pedali { background-color: #c0392b; }
+        .btn-voce { background-color: #2980b9; }
+        .btn-occhi { background-color: #d35400; }
+        .btn-clima { background-color: #27ae60; }
+
+        .log-btn span {
+            font-size: 0.7rem;
+            font-weight: normal;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        /* Registro di bordo */
+        textarea#liveLog {
+            font-family: monospace;
+            font-size: 0.9rem;
+            height: 150px;
+            resize: vertical;
+        }
+
+        /* Valutazioni finali */
+        .eval-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .eval-row select {
+            width: 80px;
+        }
+
+        /* Pulsanti Azione */
+        .action-btn {
+            background-color: var(--accent-color);
+            color: #fff;
+            font-weight: bold;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            width: 100%;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .clear-btn {
+            background-color: #444;
+            margin-top: 5px;
+        }
+
+        /* Tabella Legenda */
+        .legend-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            margin-top: 10px;
+        }
+        .legend-table th, .legend-table td {
+            border: 1px solid #444;
+            padding: 6px;
+            text-align: left;
+        }
+        .legend-table th {
+            background-color: #2d2d2d;
+            color: var(--accent-color);
+        }
+        .legend-badge {
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-align: center;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Mentor Dashboard 🚗</h2>
+    
+    <div class="card">
+        <div class="grid-inputs">
+            <div>
+                <label>Allievo/a</label>
+                <input type="text" id="allievo" placeholder="Nome Allievo">
+            </div>
+            <div>
+                <label>Sede / Patente</label>
+                <select id="sede">
+                    <option value="Genazzano">Genazzano (Pat. B)</option>
+                    <option value="Palestrina">Palestrina (Pat. B)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="section-title">Pulsantiera Log Rapido (Inserimento con Ora)</div>
+        
+        <div class="log-grid">
+            <button class="log-btn btn-pedali" onclick="addLog('⏱️ P.A.', 'Pedale Anticipato (Ruba apprendimento)')">⏱️ P.A. <span>Pedale Anticipato</span></button>
+            <button class="log-btn btn-pedali" onclick="addLog('⏱️ P.T.', 'Pedale Tardivo (Rischio intervento)')">⏱️ P.T. <span>Pedale Tardivo</span></button>
+            
+            <button class="log-btn btn-voce" onclick="addLog('🗣️ C.A.', 'Comando Anticipato (Ottimo tempismo)')">🗣️ C.A. <span>Comando Anticipato</span></button>
+            <button class="log-btn btn-voce" onclick="addLog('🗣️ C.T.', 'Comando Tardivo (Arriva lunga)')">🗣️ C.T. <span>Comando Tardivo</span></button>
+            <button class="log-btn btn-voce" onclick="addLog('🗣️ S.P.', 'Sovraccarico Parola (Parla troppo)')">🗣️ S.P. <span>Troppe Parole</span></button>
+            
+            <button class="log-btn btn-occhi" onclick="addLog('👀 O.B.', 'Occhi Bassi (Guarda comandi/cambio)')">👀 O.B. <span>Occhi Bassi</span></button>
+            <button class="log-btn btn-occhi" onclick="addLog('👀 M.C.', 'Mancato Controllo (Specchio DX/Cieco)')">👀 M.C. <span>Mancato Controllo</span></button>
+            
+            <button class="log-btn btn-clima" onclick="addLog('🧠 G.E.', 'Gestione Eccellente (Calma e recupero)')">🧠 G.E. <span>Gestione Calma</span></button>
+            <button class="log-btn btn-clima" onclick="addLog('🧠 T.A.', 'Tono Ansioso (Trasmette stress)')">🧠 T.A. <span>Tono Ansioso</span></button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="section-title">Diario di Bordo (Modificabile liberamente)</div>
+        <textarea id="liveLog" placeholder="Il diario si compila cliccando sopra, oppure scrivi qui le tue note libere..."></textarea>
+    </div>
+
+    <div class="card">
+        <div class="section-title">Valutazione Finale Tirocinante (Scala 0-10)</div>
+        
+        <div class="eval-row">
+            <label>1. Tempismo Pedali / Riflessi</label>
+            <select id="votoPedali"><script>for(let i=10;i>=0;i--) document.write(`<option value="${i}">${i}</option>`)</script></select>
+        </div>
+        <div class="eval-row">
+            <label>2. Chiarezza & Anticipo Comandi</label>
+            <select id="votoVoce"><script>for(let i=10;i>=0;i--) document.write(`<option value="${i}">${i}</option>`)</script></select>
+        </div>
+        <div class="eval-row">
+            <label>3. Sguardo e Lettura Strada (Sedile DX)</label>
+            <select id="votoOcchi"><script>for(let i=10;i>=0;i--) document.write(`<option value="${i}">${i}</option>`)</script></select>
+        </div>
+        <div class="eval-row">
+            <label>4. Leadership & Gestione Stress (Clima)</label>
+            <select id="votoClima"><script>for(let i=10;i>=0;i--) document.write(`<option value="${i}">${i}</option>`)</script></select>
+        </div>
+        <div class="eval-row">
+            <label>5. Qualità Diagnosi & Note Finali (DA FARE)</label>
+            <select id="votoNote"><script>for(let i=10;i>=0;i--) document.write(`<option value="${i}">${i}</option>`)</script></select>
+        </div>
+        
+        <label style="margin-top: 15px;">Note Finali del Mentor per la Tirocinante:</label>
+        <textarea id="noteMentor" rows="3" placeholder="Scrivi qui i punti chiave da dire alla tirocinante a motore spento..."></textarea>
+    </div>
+
+    <button class="action-btn" onclick="copyReport()">📋 Copia Report Completo</button>
+    <button class="action-btn clear-btn" onclick="clearAll()">🔄 Reset Scheda</button>
+
+    <div class="card" style="margin-top: 20px;">
+        <div class="section-title" style="color: var(--warning-color);">Guida Rapida Scala 0-10 (Livello Intervento Michele)</div>
+        <table class="legend-table">
+            <thead>
+                <tr>
+                    <th>Voto</th>
+                    <th>Fase / Significato Pratico</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="legend-badge" style="background-color: #27ae60;">9 - 10</span></td>
+                    <td><strong>GHOST MODE (Autonomia Totale):</strong> Tu sei un fantasma dietro. Lei gestisce l'allievo alla perfezione, usa i motti giusti e anticipa i pericoli. Pronta al 100%.</td>
+                </tr>
+                <tr>
+                    <td><span class="legend-badge" style="background-color: #2980b9;">7 - 8</span></td>
+                    <td><strong>DEBRIEFING A MOTORE SPENTO (Controllo Passivo):</strong> Non intervieni mai in marcia. Prendi solo appunti. Parli solo alla fine per correggere il metodo. <em>(Soglia minima per lasciarla sola)</em>.</td>
+                </tr>
+                <tr>
+                    <td><span class="legend-badge" style="background-color: #d35400;">5 - 6</span></td>
+                    <td><strong>SUGGERIMENTO POST-MANOVRA (Intervento Moderato):</strong> Lasci finire l'azione all'allievo, poi ad auto ferma ti sporgi e dai il feedback alla tirocinante prima di ripartire.</td>
+                </tr>
+                <tr>
+                    <td><span class="legend-badge" style="background-color: #c0392b;">3 - 4</span></td>
+                    <td><strong>CORREZIONE IN TEMPO REALE (Intervento Attivo):</strong> Devi interrompere la lezione durante la marcia perché lei sta dando comandi errati o fa eseguire manovre rischiose.</td>
+                </tr>
+                <tr>
+                    <td><span class="legend-badge" style="background-color: #7f8c8d;">0 - 2</span></td>
+                    <td><strong>INVASIONE D'EMERGENZA (Codice Rosso):</strong> Lei congela o non vede un pericolo. Tu devi scavalcare il sedile verbalmente o fisicamente per bloccare l'auto.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function addLog(sigla, descrizione) {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const logArea = document.getElementById('liveLog');
+        
+        const currentText = logArea.value;
+        const line = `[${timeStr}] ${sigla} -> ${descrizione}\n`;
+        
+        logArea.value = currentText + line;
+        logArea.scrollTop = logArea.scrollHeight; // Auto scroll in basso
+    }
+
+    function copyReport() {
+        const allievo = document.getElementById('allievo').value || "N.D.";
+        const荒 sede = document.getElementById('sede').value;
+        const liveLog = document.getElementById('liveLog').value;
+        const noteMentor = document.getElementById('noteMentor').value;
+        
+        const vPedali = document.getElementById('votoPedali').value;
+        const vVoce = document.getElementById('votoVoce').value;
+        const vOcchi = document.getElementById('votoOcchi').value;
+        const vClima = document.getElementById('votoClima').value;
+        const vNote = document.getElementById('votoNote').value;
+
+        const report = `REPORT FASE DI AFFIANCAMENTO TIROCINANTE
+Allievo/a guida: ${allievo} (${sede})
+-----------------------------------------
+DIARIO DI BORDO LIVE:
+${liveLog || 'Nessun log registrato.'}
+-----------------------------------------
+VALUTAZIONE LIVELLO DI INTERVENTO MENTOR (0-10):
+[Pedali/Riflessi]: ${vPedali}/10
+[Chiarezza/Anticipo Comandi]: ${vVoce}/10
+[Sguardo/Lettura Sedile DX]: ${vOcchi}/10
+[Leadership/Gestione Stress]: ${vClima}/10
+[Qualità Diagnosi/Note]: ${vNote}/10
+
+NOTE DI RIFINITURA DEL MENTOR:
+${noteMentor || 'Nessuna nota aggiuntiva.'}`;
+
+        navigator.clipboard.writeText(report).then(() => {
+            alert("Report completo copiato negli appunti! Ora puoi incollarlo su WhatsApp o nelle tue note.");
+        }).catch(err => {
+            alert("Errore nella copia, seleziona il testo manualmente.");
+        });
+    }
+
+    function clearAll() {
+        if(confirm("Sei sicuro di voler ripulire la scheda? I dati non salvati andranno persi.")) {
+            document.getElementById('allievo').value = '';
+            document.getElementById('liveLog').value = '';
+            document.getElementById('noteMentor').value = '';
+            document.getElementById('votoPedali').value = '10';
+            document.getElementById('votoVoce').value = '10';
+            document.getElementById('votoOcchi').value = '10';
+            document.getElementById('votoClima').value = '10';
+            document.getElementById('votoNote').value = '10';
+        }
+    }
+</script>
+
+</body>
+</html>
