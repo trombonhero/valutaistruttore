@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mentor Dashboard V3</title>
+    <title>Mentor Dashboard V3.1</title>
     <style>
         :root {
             --bg-color: #121212;
@@ -77,7 +77,6 @@
             color: #fff;
         }
 
-        /* Layout Blocchi Segnalazioni Con Più Spazio e Pulizia */
         .block-tag {
             border-radius: 8px;
             padding: 12px;
@@ -107,7 +106,6 @@
             font-weight: 500;
         }
 
-        /* Interfaccia Stepper (+ e -) */
         .stepper {
             display: flex;
             align-items: center;
@@ -143,7 +141,6 @@
             text-align: center;
         }
 
-        /* Valutazioni finali */
         .eval-row {
             display: flex;
             justify-content: space-between;
@@ -161,7 +158,6 @@
             border-color: var(--accent-color);
         }
 
-        /* Bottoni Principali */
         .action-btn {
             background-color: #10ac84;
             color: #fff;
@@ -181,23 +177,34 @@
             padding: 10px;
         }
 
+        /* Guida Voti Compatta */
+        .mini-legend {
+            font-size: 0.8rem;
+            line-height: 1.4;
+            color: #aaa;
+        }
+        .mini-legend ul {
+            margin: 5px 0 0 0;
+            padding-left: 15px;
+        }
+        .mini-legend li {
+            margin-bottom: 4px;
+        }
+
         .print-header { display: none; }
 
-        /* =======================================================
-           FORMATTAZIONE OTTIMIZZATA PER IL PDF NATIVO
-           ======================================================= */
         @media print {
             body { background: #fff !important; color: #000 !important; padding: 0; }
             .container { max-width: 100%; }
             .card { background: #fff !important; box-shadow: none !important; border: 1px solid #ddd !important; margin-bottom: 15px !important; padding: 15px !important; }
-            .step-btn, .action-btn, .clear-btn, h2 { display: none !important; }
+            .step-btn, .action-btn, .clear-btn, h2, .mini-legend-card { display: none !important; }
             .print-header { display: block !important; text-align: center; border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
             .print-header h1 { margin: 0; font-size: 1.6rem; color: #000; }
             .section-title { color: #000 !important; border-bottom: 2px solid #000 !important; font-size: 1.1rem !important; margin-top: 10px; }
             .block-tag { background: #fff !important; border: none !important; padding: 0 !important; margin-bottom: 5px !important; }
             .tag-item { background: transparent !important; padding: 4px 0 !important; color: #000 !important; border-bottom: 1px dashed #eee; }
             .step-value { font-weight: bold; color: #000; }
-            .step-value::before { content: "Frequenza: "; font-weight: normal; font-size: 0.85rem; color: #555; }
+            .step-value::before { content: "Conteggio: "; font-weight: normal; font-size: 0.85rem; color: #555; }
             input, textarea { background: #fff !important; color: #000 !important; border: 1px solid #999 !important; padding: 8px !important; }
             textarea { height: auto !important; min-height: 100px; }
             .eval-row { background: #f5f5f5 !important; border: 1px solid #ccc !important; color: #000 !important; }
@@ -215,7 +222,7 @@
         <p>Programma Mentor di Supervisione e Controllo</p>
     </div>
 
-    <h2>Mentor Dashboard V3 🚗</h2>
+    <h2>Mentor Dashboard V3.1 🚗</h2>
     
     <div class="card">
         <div class="grid-inputs">
@@ -344,7 +351,7 @@
     </div>
 
     <div class="card">
-        <div class="section-title">Valutazione Finale Automatico-Interattiva (0-10)</div>
+        <div class="section-title">Valutazione Finale (Auto-Accordata 0-10)</div>
         
         <div class="eval-row">
             <label>1. Tempismo Pedali / Riflessi</label>
@@ -371,10 +378,22 @@
     <button class="action-btn" onclick="window.print()">📥 SCARICA PDF REPORT COMPLETO</button>
     <button class="action-btn clear-btn" onclick="clearAll()">🔄 Ripristina Schermata Vuota</button>
 
+    <div class="card mini-legend-card" style="margin-top: 15px; border: 1px dashed #444;">
+        <div class="mini-legend">
+            <strong>Guida Rapida Intervento Mentor (0-10):</strong>
+            <ul>
+                <li><strong>9 - 10: Ghost Mode.</strong> Autonomia totale della tirocinante. Tu sei un fantasma dietro.</li>
+                <li><strong>7 - 8: Controllo Passivo.</strong> Intervieni solo a motore spento a fine lezione. <em>(Soglia minima autonomia)</em>.</li>
+                <li><strong>5 - 6: Intervento Moderato.</strong> Ti sporgi in avanti e le dai suggerimenti ad auto ferma tra una manovra e l'altra.</li>
+                <li><strong>3 - 4: Intervento Attivo.</strong> Devi correggerla verbalmente a vettura in movimento perché dà indicazioni errate.</li>
+                <li><strong>0 - 2: Codice Rosso.</strong> Devi intervenire fisicamente o con comandi secchi per evitare situazioni di pericolo.</li>
+            </ul>
+        </div>
+    </div>
+
 </div>
 
 <script>
-    // Registro centrale dei contatori
     let contatori = { PA: 0, PT: 0, PP: 0, CA: 0, CT: 0, SP: 0, OB: 0, MC: 0, GE: 0, TA: 0 };
 
     window.onload = function() {
@@ -399,38 +418,23 @@
         document.getElementById('votoNote').value = 8;
     }
 
-    // Gestione incremento e decremento dinamico dei tag
     function step(codice, variazione) {
-        // Applica variazione impedendo di scendere sotto lo zero
-        contatori[codice] = Math.max(0, contatori[codice] + valeur = variazione);
+        // Corretto il bug: ora incrementa o decrementa senza blocchi syntax error
+        contatori[codice] = Math.max(0, contatori[codice] + variazione);
         
-        // Aggiorna la cifra sul display corrispondente
         document.getElementById(`val-${codice}`).innerHTML = contatori[codice];
-
-        // Ricalcola istantaneamente tutta l'impalcatura dei voti
         calcolaPunteggiDinamici();
     }
 
     function calcolaPunteggiDinamici() {
-        // 1. PEDALI (Partenza da 10, i pedali pesano molto sulla sicurezza)
         let pedali = 10 - (contatori.PA * 1.5) - (contatori.PT * 2.5) - (contatori.PP * 0.5);
-        
-        // 2. VOCE (Partenza da 8, il comando anticipato premia, gli errori tagliano)
         let voce = 8 + (contatori.CA * 1.0) - (contatori.CT * 2.0) - (contatori.SP * 1.0);
-        
-        // 3. OCCHI (Partenza da 10)
         let occhi = 10 - (contatori.OB * 1.5) - (contatori.MC * 3.0);
-        
-        // 4. CLIMA (Partenza da 8)
         let clima = 8 + (contatori.GE * 1.0) - (contatori.TA * 2.0);
-        
-        // 5. NOTE/DIAGNOSI (Risente del bilanciamento complessivo)
         let note = 8 + (contatori.CA * 0.5) - (contatori.SP * 0.5) - (contatori.CT * 0.5);
 
-        // Funzione di blocco (clamping) tra 0 e 10 con arrotondamento pulito
         const sistemaVoto = (valore) => Math.min(10, Math.max(0, Math.round(valore)));
 
-        // Sposta i nuovi valori nei menu a tendina all'istante
         document.getElementById('votoPedali').value = sistemaVoto(pedali);
         document.getElementById('votoVoce').value = sistemaVoto(voce);
         document.getElementById('votoOcchi').value = sistemaVoto(occhi);
@@ -444,7 +448,6 @@
             document.getElementById('patente').value = '';
             document.getElementById('manualNotes').value = '';
             
-            // Ripristina tutti i contatori grafici ed interni
             for (let chiave in contatori) { 
                 contatori[chiave] = 0; 
                 document.getElementById(`val-${chiave}`).innerHTML = 0;
