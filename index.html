@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mentor Dashboard V2</title>
+    <title>Mentor Dashboard V3</title>
     <style>
         :root {
             --bg-color: #121212;
@@ -75,52 +75,72 @@
             padding-bottom: 6px;
             margin-bottom: 12px;
             color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
-        /* Layout Blocchi Pulsanti Separati */
+        /* Layout Blocchi Segnalazioni Con Più Spazio e Pulizia */
         .block-tag {
-            border: 1px solid #333;
             border-radius: 8px;
             padding: 12px;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             background-color: #181818;
-        }
-        
-        .tag-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
+            border: 1px solid #2a2a2a;
         }
 
-        .btn-tag {
-            flex: 1;
-            min-width: 120px;
-            padding: 12px 8px;
-            font-size: 0.85rem;
-            font-weight: bold;
+        .tag-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .tag-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #242424;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .tag-text {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Interfaccia Stepper (+ e -) */
+        .stepper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .step-btn {
+            width: 36px;
+            height: 36px;
             border: none;
             border-radius: 6px;
-            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
             color: #fff;
-            text-align: center;
-            transition: transform 0.1s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.1s;
         }
-        .btn-tag:active { transform: scale(0.95); }
+        .step-btn:active { opacity: 0.7; }
+        
+        .btn-minus { background-color: #444; }
+        .btn-plus-pedali { background-color: var(--pedali-color); }
+        .btn-plus-voce { background-color: var(--voce-color); color: #121212; }
+        .btn-plus-occhi { background-color: var(--occhi-color); }
+        .btn-plus-clima { background-color: var(--clima-color); }
 
-        .p-bg { background-color: var(--pedali-color); }
-        .v-bg { background-color: var(--voce-color); color: #121212; }
-        .o-bg { background-color: var(--occhi-color); }
-        .c-bg { background-color: var(--clima-color); }
-
-        /* Diario di Bordo */
-        textarea#liveLog {
-            font-family: monospace;
-            font-size: 0.95rem;
-            height: 160px;
-            line-height: 1.4;
+        .step-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
         }
 
         /* Valutazioni finali */
@@ -141,7 +161,7 @@
             border-color: var(--accent-color);
         }
 
-        /* Bottoni Azione Principali */
+        /* Bottoni Principali */
         .action-btn {
             background-color: #10ac84;
             color: #fff;
@@ -161,22 +181,25 @@
             padding: 10px;
         }
 
-        /* Titolo nascosto a schermo, visibile solo in stampa */
         .print-header { display: none; }
 
         /* =======================================================
-           STILE TIPOGRAFICO PER IL DOWNLOAD IN PDF (STAMPA)
+           FORMATTAZIONE OTTIMIZZATA PER IL PDF NATIVO
            ======================================================= */
         @media print {
             body { background: #fff !important; color: #000 !important; padding: 0; }
             .container { max-width: 100%; }
             .card { background: #fff !important; box-shadow: none !important; border: 1px solid #ddd !important; margin-bottom: 15px !important; padding: 15px !important; }
-            .block-tag, .action-btn, .clear-btn, h2 { display: none !important; }
+            .step-btn, .action-btn, .clear-btn, h2 { display: none !important; }
             .print-header { display: block !important; text-align: center; border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
             .print-header h1 { margin: 0; font-size: 1.6rem; color: #000; }
-            .section-title { color: #000 !important; border-bottom: 2px solid #000 !important; font-size: 1.1rem !important; }
+            .section-title { color: #000 !important; border-bottom: 2px solid #000 !important; font-size: 1.1rem !important; margin-top: 10px; }
+            .block-tag { background: #fff !important; border: none !important; padding: 0 !important; margin-bottom: 5px !important; }
+            .tag-item { background: transparent !important; padding: 4px 0 !important; color: #000 !important; border-bottom: 1px dashed #eee; }
+            .step-value { font-weight: bold; color: #000; }
+            .step-value::before { content: "Frequenza: "; font-weight: normal; font-size: 0.85rem; color: #555; }
             input, textarea { background: #fff !important; color: #000 !important; border: 1px solid #999 !important; padding: 8px !important; }
-            textarea#liveLog { height: auto !important; min-height: 120px; }
+            textarea { height: auto !important; min-height: 100px; }
             .eval-row { background: #f5f5f5 !important; border: 1px solid #ccc !important; color: #000 !important; }
             .eval-row select { background: #f5f5f5 !important; color: #000 !important; border: none !important; -webkit-appearance: none; appearance: none; font-size: 1.1rem !important; }
             label { color: #333 !important; }
@@ -188,70 +211,140 @@
 <div class="container">
     
     <div class="print-header">
-        <h1>RELAZIONE VALUTAZIONE TIROCINANTE</h1>
-        <p>Autoscuola Fortunato - Programma Mentor di Affiancamento</p>
+        <h1>RELAZIONE VALUTAZIONE GUIDA TIROCINANTE</h1>
+        <p>Programma Mentor di Supervisione e Controllo</p>
     </div>
 
-    <h2>Mentor Dashboard V2 🚗</h2>
+    <h2>Mentor Dashboard V3 🚗</h2>
     
     <div class="card">
         <div class="grid-inputs">
             <div>
                 <label>Allievo / Allieva Guida</label>
-                <input type="text" id="allievo" placeholder="Es. Mastrantonio Adriano">
+                <input type="text" id="allievo" placeholder="Nome Allievo">
             </div>
             <div>
-                <label>Dettaglio Patente & Sede</label>
-                <input type="text" id="patente" placeholder="Es. Pat. B • Genazzano">
+                <label>Dettaglio Patente</label>
+                <input type="text" id="patente" placeholder="Es. Pat. B • Palestrina">
             </div>
         </div>
     </div>
 
     <div class="card">
-        <div class="section-title">Pulsantiera Segnalazioni Rapide (Auto-Calcolo Voti)</div>
+        <div class="section-title">Registro Comportamenti (Usa i tasti + e -)</div>
         
         <div class="block-tag" style="border-left: 4px solid var(--pedali-color);">
             <label style="color: var(--pedali-color);">⏱️ GESTIONE PEDALI & RIFLESSI</label>
-            <div class="tag-row">
-                <button class="btn-tag p-bg" onclick="addTag('PA', '⏱️ P.A. [Pedale Anticipato]')">P.A. (Anticipato)</button>
-                <button class="btn-tag p-bg" onclick="addTag('PT', '⏱️ P.T. [Pedale Tardivo]')">P.T. (Tardivo)</button>
-                <button class="btn-tag p-bg" onclick="addTag('PP', '⏱️ P.P. [Piede Pesante]')">P.P. (Piede Friz.)</button>
+            <div class="tag-list">
+                <div class="tag-item">
+                    <span class="tag-text">P.A. (Pedale Anticipato - Ruba spazio)</span>
+                    <div class="stepper">
+                        <button class="step-btn btn-minus" onclick="step('PA', -1)">-</button>
+                        <span class="step-value" id="val-PA">0</span>
+                        <button class="step-btn btn-plus-pedali" onclick="step('PA', 1)">+</button>
+                    </div>
+                </div>
+                <div class="tag-item">
+                    <span class="tag-text">P.T. (Pedale Tardivo - Rischio)</span>
+                    <div class="stepper">
+                        <button class="step-btn btn-minus" onclick="step('PT', -1)">-</button>
+                        <span class="step-value" id="val-PT">0</span>
+                        <button class="step-btn btn-plus-pedali" onclick="step('PT', 1)">+</button>
+                    </div>
+                </div>
+                <div class="tag-item">
+                    <span class="tag-text">P.P. (Piede Pesante su Frizione)</span>
+                    <div class="stepper">
+                        <button class="step-btn btn-minus" onclick="step('PP', -1)">-</button>
+                        <span class="step-value" id="val-PP">0</span>
+                        <button class="step-btn btn-plus-pedali" onclick="step('PP', 1)">+</button>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="block-tag" style="border-left: 4px solid var(--voce-color);">
             <label style="color: var(--voce-color);">🗣️ COMANDI VOCALI & ANTICIPO</label>
-            <div class="tag-row">
-                <button class="btn-tag v-bg" onclick="addTag('CA', '🗣️ C.A. [Comando Anticipato]')">C.A. (Ottimo)</button>
-                <button class="btn-tag v-bg" onclick="addTag('CT', '🗣️ C.T. [Comando Tardivo]')">C.T. (In Ritardo)</button>
-                <button class="btn-tag v-bg" onclick="addTag('SP', '🗣️ S.P. [Sovraccarico Parola]')">S.P. (Parla Troppo)</button>
+            <div class="tag-list">
+                <div class="tag-item">
+                    <span class="tag-text">C.A. (Comando Anticipato - Ottimo)</span>
+                    <div class="stepper">
+                        <button class="step-btn btn-minus" onclick="step('CA', -1)">-</button>
+                        <span class="step-value" id="val-CA">0</span>
+                        <button class="step-btn btn-plus-voce" onclick="step('CA', 1)">+</button>
+                    </div>
+                </div>
+                <div class="tag-item">
+                    <span class="tag-text">C.T. (Comando Tardivo - In ritardo)</span>
+                    <div class="stepper">
+                        <button class="step-btn btn-minus" onclick="step('CT', -1)">-</button>
+                        <span class="step-value" id="val-CT">0</span>
+                        <button class="step-btn btn-plus-voce" onclick="step('CT', 1)">+</button>
+                    </div>
+                </div>
+                <div class="tag-item">
+                    <span class="tag-text">S.P. (Sovraccarico Parola - Parla troppo)</span>
+                    <div class="stepper">
+                        <button class="step-btn btn-minus" onclick="step('SP', -1)">-</button>
+                        <span class="step-value" id="val-SP">0</span>
+                        <button class="step-btn btn-plus-voce" onclick="step('SP', 1)">+</button>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="block-tag" style="border-left: 4px solid var(--occhi-color);">
-            <label style="color: var(--occhi-color);">👀 SGUARDO & CONTROLLO STRADA</label>
-            <div class="tag-row">
-                <button class="btn-tag o-bg" onclick="addTag('OB', '👀 O.B. [Occhi Bassi su Cambio/Cruscotto]')">O.B. (Occhi Bassi)</button>
-                <button class="btn-tag o-bg" onclick="addTag('MC', '👀 M.C. [Mancato Controllo Specchi/Cieco]')">M.C. (No Specchi)</button>
+            <label style="color: var(--occhi-color);">👀 SGUARDO & LETTURA STRADA</label>
+            <div class="tag-list">
+                <div class="tag-item">
+                    <span class="tag-text">O.B. (Occhi Bassi su Cambio/Cruscotto)</span>
+                    <div class="stepper">
+                        <button class="step-btn btn-minus" onclick="step('OB', -1)">-</button>
+                        <span class="step-value" id="val-OB">0</span>
+                        <button class="step-btn btn-plus-occhi" onclick="step('OB', 1)">+</button>
+                    </div>
+                </div>
+                <div class="tag-item">
+                    <span class="tag-text">M.C. (Mancato Controllo Specchi/Cieco)</span>
+                    <div class="stepper">
+                        <button class="step-btn btn-minus" onclick="step('MC', -1)">-</button>
+                        <span class="step-value" id="val-MC">0</span>
+                        <button class="step-btn btn-plus-occhi" onclick="step('MC', 1)">+</button>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="block-tag" style="border-left: 4px solid var(--clima-color);">
             <label style="color: var(--clima-color);">🧠 EMOTIVITÀ & GESTIONE STRESS</label>
-            <div class="tag-row">
-                <button class="btn-tag c-bg" onclick="addTag('GE', '🧠 G.E. [Gestione Eccellente del Panico]')">G.E. (Calma Top)</button>
-                <button class="btn-tag c-bg" onclick="addTag('TA', '🧠 T.A. [Tono Ansioso / Irritato]')">T.A. (Tono Teso)</button>
+            <div class="tag-list">
+                <div class="tag-item">
+                    <span class="tag-text">G.E. (Gestione Eccellente del Panico)</span>
+                    <div class="stepper">
+                        <button class="step-btn btn-minus" onclick="step('GE', -1)">-</button>
+                        <span class="step-value" id="val-GE">0</span>
+                        <button class="step-btn btn-plus-clima" onclick="step('GE', 1)">+</button>
+                    </div>
+                </div>
+                <div class="tag-item">
+                    <span class="tag-text">T.A. (Tono Ansioso / Irritato)</span>
+                    <div class="stepper">
+                        <button class="step-btn btn-minus" onclick="step('TA', -1)">-</button>
+                        <span class="step-value" id="val-TA">0</span>
+                        <button class="step-btn btn-plus-clima" onclick="step('TA', 1)">+</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="card">
-        <div class="section-title">Elenco Segnalazioni Accumulate</div>
-        <textarea id="liveLog" placeholder="I tag cliccati appariranno qui automaticamente come elenco..."></textarea>
+        <div class="section-title">Note Libere e Diario di Bordo (Scrittura Manuale)</div>
+        <textarea id="manualNotes" placeholder="Questa zona è completamente libera per i tuoi appunti chirurgici sulla guida..."></textarea>
     </div>
 
     <div class="card">
-        <div class="section-title">Valutazione Livello Intervento Mentor (Scala 0-10)</div>
+        <div class="section-title">Valutazione Finale Automatico-Interattiva (0-10)</div>
         
         <div class="eval-row">
             <label>1. Tempismo Pedali / Riflessi</label>
@@ -273,21 +366,17 @@
             <label>5. Qualità Diagnosi & Note Finali (DA FARE)</label>
             <select id="votoNote"></select>
         </div>
-        
-        <label style="margin-top: 15px;">Note Finali del Mentor (Punti chiave debriefing):</label>
-        <textarea id="noteMentor" rows="3" placeholder="Note da riferire a motore spento per farla crescere..."></textarea>
     </div>
 
-    <button class="action-btn" onclick="window.print()">📥 SCARICA PDF REPORT</button>
+    <button class="action-btn" onclick="window.print()">📥 SCARICA PDF REPORT COMPLETO</button>
     <button class="action-btn clear-btn" onclick="clearAll()">🔄 Ripristina Schermata Vuota</button>
 
 </div>
 
 <script>
-    // Registro dei conteggi dei tag inseriti per l'algoritmo
+    // Registro centrale dei contatori
     let contatori = { PA: 0, PT: 0, PP: 0, CA: 0, CT: 0, SP: 0, OB: 0, MC: 0, GE: 0, TA: 0 };
 
-    // Funzione per popolare i menu a tendina 0-10 all'avvio
     window.onload = function() {
         const dropIds = ['votoPedali', 'votoVoce', 'votoOcchi', 'votoClima', 'votoNote'];
         dropIds.forEach(id => {
@@ -303,47 +392,45 @@
     };
 
     function resetVotiIniziali() {
-        // Valori di partenza ideali
         document.getElementById('votoPedali').value = 10;
-        document.getElementById('votoVoce').value = 8; // parte da 8, i CA aumentano, i CT diminuiscono
+        document.getElementById('votoVoce').value = 8;
         document.getElementById('votoOcchi').value = 10;
         document.getElementById('votoClima').value = 8;
         document.getElementById('votoNote').value = 8;
     }
 
-    // Inserimento Tag nel diario e calcolo automatico dei punteggi
-    function addTag(codice, testoCompleto) {
-        const logArea = document.getElementById('liveLog');
-        logArea.value += `• ${testoCompleto}\n`;
-        logArea.scrollTop = logArea.scrollHeight; // Auto-scroll
+    // Gestione incremento e decremento dinamico dei tag
+    function step(codice, variazione) {
+        // Applica variazione impedendo di scendere sotto lo zero
+        contatori[codice] = Math.max(0, contatori[codice] + valeur = variazione);
+        
+        // Aggiorna la cifra sul display corrispondente
+        document.getElementById(`val-${codice}`).innerHTML = contatori[codice];
 
-        // Incrementa il contatore specifico del tag cliccato
-        contatori[codice]++;
-
-        // Esegui il calcolo matematico dei voti in base ai pesi assegnati
+        // Ricalcola istantaneamente tutta l'impalcatura dei voti
         calcolaPunteggiDinamici();
     }
 
     function calcolaPunteggiDinamici() {
-        // 1. PEDALI (Base 10)
+        // 1. PEDALI (Partenza da 10, i pedali pesano molto sulla sicurezza)
         let pedali = 10 - (contatori.PA * 1.5) - (contatori.PT * 2.5) - (contatori.PP * 0.5);
         
-        // 2. VOCE (Base 7, i comportamenti positivi aggiungono punti)
-        let voce = 7 + (contatori.CA * 1.0) - (contatori.CT * 2.0) - (contatori.SP * 1.0);
+        // 2. VOCE (Partenza da 8, il comando anticipato premia, gli errori tagliano)
+        let voce = 8 + (contatori.CA * 1.0) - (contatori.CT * 2.0) - (contatori.SP * 1.0);
         
-        // 3. OCCHI (Base 10)
+        // 3. OCCHI (Partenza da 10)
         let occhi = 10 - (contatori.OB * 1.5) - (contatori.MC * 3.0);
         
-        // 4. CLIMA (Base 7)
-        let clima = 7 + (contatori.GE * 1.5) - (contatori.TA * 2.0);
+        // 4. CLIMA (Partenza da 8)
+        let clima = 8 + (contatori.GE * 1.0) - (contatori.TA * 2.0);
         
-        // 5. NOTE/DIAGNOSI (Risente indirettamente della lucidità generale)
-        let note = 8 + (contatori.GE * 0.5) - (contatori.SP * 0.5) - (contatori.CT * 0.5);
+        // 5. NOTE/DIAGNOSI (Risente del bilanciamento complessivo)
+        let note = 8 + (contatori.CA * 0.5) - (contatori.SP * 0.5) - (contatori.CT * 0.5);
 
-        // Funzione di contenimento (Clamping) per non scendere sotto 0 e non superare 10
+        // Funzione di blocco (clamping) tra 0 e 10 con arrotondamento pulito
         const sistemaVoto = (valore) => Math.min(10, Math.max(0, Math.round(valore)));
 
-        // Aggiorna l'interfaccia visiva all'istante
+        // Sposta i nuovi valori nei menu a tendina all'istante
         document.getElementById('votoPedali').value = sistemaVoto(pedali);
         document.getElementById('votoVoce').value = sistemaVoto(voce);
         document.getElementById('votoOcchi').value = sistemaVoto(occhi);
@@ -352,13 +439,16 @@
     }
 
     function clearAll() {
-        if(confirm("Vuoi azzerare la scheda corrente? Tutti i dati andranno persi.")) {
+        if(confirm("Vuoi azzerare la lezione corrente? Tutti i contatori e le note verranno cancellati.")) {
             document.getElementById('allievo').value = '';
             document.getElementById('patente').value = '';
-            document.getElementById('liveLog').value = '';
-            document.getElementById('noteMentor').value = '';
-            // Azzera i contatori interni dell'algoritmo
-            for (let chiave in contatori) { contatori[chiave] = 0; }
+            document.getElementById('manualNotes').value = '';
+            
+            // Ripristina tutti i contatori grafici ed interni
+            for (let chiave in contatori) { 
+                contatori[chiave] = 0; 
+                document.getElementById(`val-${chiave}`).innerHTML = 0;
+            }
             resetVotiIniziali();
         }
     }
