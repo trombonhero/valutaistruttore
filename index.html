@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mentor Dashboard V4</title>
+    <title>Mentor Dashboard V5</title>
     <style>
         :root {
             --bg-color: #121212;
@@ -198,13 +198,13 @@
         @media print {
             @page {
                 size: A4 portrait;
-                margin: 8mm 8mm 8mm 8mm; /* Margini ridotti per massimizzare lo spazio */
+                margin: 8mm 8mm 8mm 8mm;
             }
             body {
                 background: #fff !important;
                 color: #000 !important;
                 padding: 0;
-                font-size: 11px !important; /* Compressione dei testi globali */
+                font-size: 11px !important;
                 line-height: 1.15 !important;
             }
             .container {
@@ -215,12 +215,12 @@
                 background: #fff !important;
                 box-shadow: none !important;
                 border: 1px solid #ccc !important;
-                margin-bottom: 8px !important; /* Spazi verticali minimizzati */
+                margin-bottom: 8px !important;
                 padding: 10px !important;
-                page-break-inside: avoid; /* Impedisce spaccature orfane */
+                page-break-inside: avoid;
             }
             .step-btn, .action-btn, .clear-btn, h2, .mini-legend-card {
-                display: none !important; /* Nasconde elementi di interfaccia superflui */
+                display: none !important;
             }
             .print-header {
                 display: block !important;
@@ -285,7 +285,7 @@
                 color: #000 !important;
                 border: 1px solid #999 !important;
                 padding: 6px !important;
-                height: 90px !important; /* Altezza bloccata per garantire il rientro nell'A4 */
+                height: 90px !important;
                 min-height: 90px !important;
             }
             .eval-row {
@@ -302,8 +302,11 @@
                 -webkit-appearance: none;
                 appearance: none;
                 font-size: 1rem !important;
-                width: 35px;
+                width: 50px !important; /* Allargato per evitare il taglio del numero 10 */
+                text-align: center !important;
                 font-weight: bold;
+                padding: 0 !important;
+                margin: 0 !important;
             }
             label {
                 color: #111 !important;
@@ -318,10 +321,10 @@
     
     <div class="print-header">
         <h1>RELAZIONE VALUTAZIONE GUIDA TIROCINANTE</h1>
-        <p>Programma Mentor di Supervisione e Controllo - Autoscuola Fortunato</p>
+        <p>Programma Mentor di Supervisione e Controllo - Conti Autoscuole</p>
     </div>
 
-    <h2>Mentor Dashboard V4 🚗</h2>
+    <h2>Mentor Dashboard V5 🚗</h2>
     
     <div class="card">
         <div class="grid-inputs">
@@ -351,7 +354,7 @@
                     </div>
                 </div>
                 <div class="tag-item">
-                    <span class="tag-text">Pedale Tardivo - Condizione di potenziale rischio</span>
+                    <span class="tag-text">Pedale Tardivo - Condizione di potenziale risco</span>
                     <div class="stepper">
                         <button class="step-btn btn-minus" onclick="step('PT', -1)">-</button>
                         <span class="step-value" id="val-PT">0</span>
@@ -359,7 +362,7 @@
                     </div>
                 </div>
                 <div class="tag-item">
-                    <span class="tag-text">Piede Pesante - Copertura costante della frizione</span>
+                    <span class="tag-text">Piede Pesante - Copertura costante dei pedali</span>
                     <div class="stepper">
                         <button class="step-btn btn-minus" onclick="step('PP', -1)">-</button>
                         <span class="step-value" id="val-PP">0</span>
@@ -403,7 +406,7 @@
             <label style="color: var(--occhi-color);">SGUARDO & LETTURA STRADA DAL SEDILE DESTRO</label>
             <div class="tag-list">
                 <div class="tag-item">
-                    <span class="tag-text">Occhi Bassi - Sguardo fisso su leva cambio o cruscotto</span>
+                    <span class="tag-text">Occhi Bassi - Sguardo fisso</span>
                     <div class="stepper">
                         <button class="step-btn btn-minus" onclick="step('OB', -1)">-</button>
                         <span class="step-value" id="val-OB">0</span>
@@ -411,7 +414,7 @@
                     </div>
                 </div>
                 <div class="tag-item">
-                    <span class="tag-text">Mancato Controllo - Assenza di verifica specchio destro o angolo cieco</span>
+                    <span class="tag-text">Mancato Controllo - Assenza di verifica angolo cieco</span>
                     <div class="stepper">
                         <button class="step-btn btn-minus" onclick="step('MC', -1)">-</button>
                         <span class="step-value" id="val-MC">0</span>
